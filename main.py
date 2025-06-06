@@ -121,4 +121,4 @@ async def vente(ctx):
         await ctx.send("⏰ Aucune image reçue. Si tu as un screen, merci de l'envoyer rapidement la prochaine fois.")
 
 # Démarre le bot
-bot.run("")
+bot.run("MTM3OTkxNzc4NzIzNzA1NjUyMw.GkMWho.XhNb47zhFimP5LSWBDxG1VviVheDDMNPPDS2gE")
