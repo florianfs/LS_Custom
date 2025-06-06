@@ -4,6 +4,8 @@ import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 import datetime
 import pytz
+import json
+import os
 
 # Intents
 intents = discord.Intents.default()
@@ -12,12 +14,13 @@ intents.members = True
 
 bot = commands.Bot(command_prefix="!", intents=intents)
 
-# Google Sheets auth
+# Auth Google Sheets depuis variable d’environnement
+creds_dict = json.loads(os.getenv("GOOGLE_CREDS_JSON"))
 scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-creds = ServiceAccountCredentials.from_json_keyfile_name("credentials.json", scope)
+creds = ServiceAccountCredentials.from_json_keyfile_dict(creds_dict, scope)
 client = gspread.authorize(creds)
 
-# Google Sheets URL
+# Lien vers la feuille Google Sheets
 spreadsheet = client.open_by_url("https://docs.google.com/spreadsheets/d/1ixALQkOLF-lqjvpXik3Q5AUilsx3F5m_5yNGkb83ccs/edit")
 
 @bot.event
@@ -78,7 +81,6 @@ async def vente(ctx):
         ligne_vide_relative = next((i for i, val in enumerate(donnees_rep) if not val or val[0].strip() == ""), len(donnees_rep))
         ligne_ecriture = 10 + ligne_vide_relative
 
-        # Demande s'il s'est déplacé
         await ctx.send("🚗 Est-ce que tu t'es déplacé ? (oui/non)")
         try:
             deplacement = await bot.wait_for("message", timeout=30.0, check=check)
@@ -101,7 +103,6 @@ async def vente(ctx):
         await ctx.send("❌ Choix invalide. Utilise 1 ou 2.")
         return
 
-    # Attente du screen (image)
     try:
         message = await bot.wait_for(
             "message",
@@ -116,9 +117,8 @@ async def vente(ctx):
             await ctx.send("✅ Screen transféré dans le salon dédié.")
         else:
             await ctx.send(f"⚠️ Salon '{pseudo_salon}' introuvable pour transférer le screen.")
-
     except:
         await ctx.send("⏰ Aucune image reçue. Si tu as un screen, merci de l'envoyer rapidement la prochaine fois.")
 
-# Démarre le bot
-bot.run("MTM3OTkxNzc4NzIzNzA1NjUyMw.GkMWho.XhNb47zhFimP5LSWBDxG1VviVheDDMNPPDS2gE")
+# Lance le bot avec la variable d'environnement DISCORD_TOKEN
+bot.run(os.getenv("DISCORD_TOKEN"))
